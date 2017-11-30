@@ -18,9 +18,9 @@ Outer = 3
 def calc_all_squares():
     """Function to calculate the array references for all valid board squares."""
     result = []
-    for x in range(11, 89):
-        y = x % 10
-        if 1 <= y and y <= 8:
+    for x in range(18, 271):
+        y = x % 17
+        if 1 <= y and y <= 15:
             result.append(x)
     # final = tuple(result)
     final = result
@@ -28,16 +28,16 @@ def calc_all_squares():
 
 
 All_Squares = calc_all_squares()
-All_Directions = [-11, -10, -9, -1, 1, 9, 10, 11]
+All_Directions = [-18, -17, -16, -1, 1, 16, 17, 18]
 BigInitialValue = 1000000
 
 # Constants for graphics
-GridSize = 60  # size in pixels of each square on playing board
+GridSize = 25  # size in pixels of each square on playing board
 PieceSize = GridSize - 8  # size in pixels of each playing piece
 Offset = 2  # offset in pixels of board from edge of canvas
 BoardColor = '#cccccc'  # color of board - medium green
-HiliteColor = '#53ff1a'  # color of highlighted square - light green
-PlayerColors = ('', '#000000', '#ffffff')  # rgb values for black, white
+HiliteColor = '#cffffc'  # color of highlighted square - light green
+PlayerColors = ('', '#FFFD1B', '#0102FF')  # rgb values for black, white
 PlayerNames = ('', 'Black', 'White')  # Names of players as displayed to the user
 MoveDelay = 1000  # pause 1000 msec (1 sec) between moves
 fn_array = [None, None]  # array to hold user-defined functions
@@ -399,17 +399,17 @@ class BoardState:
         """Create an initial boardstate with the default start state."""
         # b = array.array('b',chr(0) * 100)
         # above makes an array, but this array is uncopyable, making it almost useless
-        b = [Outer] * 100
+        b = [Outer] * 289
         for sq in All_Squares:
             b[sq] = Empty
         ##        b[44] = White; b[45] = Black;
         ##        b[54] = Black; b[55] = White;
         b[44] = White;
-        b[55] = White;
-        b[66] = White;
+        b[62] = White;
+        b[70] = White;
         b[45] = Black;
-        b[54] = Black;
-        b[56] = Black;
+        b[63] = Black;
+        b[71] = Black;
         self._board = b
 
         self.to_move = Black  # Black has the first move
@@ -458,7 +458,7 @@ class BoardState:
         moves = []
         for move in self._moves:
             if move != None:
-                moves.append(((move // 10) - 1, (move % 10) - 1))
+                moves.append(((move // 17) - 1, (move % 17) - 1))
         return tuple(moves)
 
     def calculate_legal_moves(self):
@@ -498,10 +498,10 @@ class BoardState:
     def getPieces(self):
         "Make a dictionary of (x, y): player for each occupied square of the game."
         pieces = {}
-        for row in range(0, 8):
-            for col in range(0, 8):
-                if self._board[row * 10 + col + 11] != Empty:
-                    pieces[(row, col)] = self._board[row * 10 + col + 11]
+        for row in range(0, 15):
+            for col in range(0, 15):
+                if self._board[row * 17 + col + 18] != Empty:
+                    pieces[(row, col)] = self._board[row * 17 + col + 18]
                     # print "row", row, "col", col, pieces[(row,col)]
         return pieces
 
@@ -521,10 +521,10 @@ class Othello(Game):
         self.initial = self.current_state
 
     def display(self, boardstate):
-        print(' ', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h')
-        for row in range(1, 9):
+        print(' ', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o')
+        for row in range(1, 16):
             print(row)
-            for col in range(1, 9):
+            for col in range(1, 16):
                 print({Empty: '.',
                        Black: 'B',
                        White: 'W'}[boardstate._board[col + 10 * row]])
@@ -569,7 +569,7 @@ class Board:
 
         def __init__(self, x, y):
             self.x, self.y = x, y  # location of square (in range 0-7)
-            self.ref = (x * 10) + y + 11  # location of square in internal board representation
+            self.ref = (x * 17) + y + 18  # location of square in internal board representation
             self.player = 0  # number of player occupying square
             self.squareId = 0  # canvas id of rectangle
             self.pieceId = 0  # canvas id of circle
@@ -588,7 +588,7 @@ class Board:
         # set the window title
         self._frame.master.wm_title('Pythello')
         # build the board on a Tk drawing canvas
-        size = 8 * GridSize  # make room for 8x8 squares
+        size = 15 * GridSize  # make room for 8x8 squares
         self._canvas = Canvas(self._frame, width=size, height=size)
         self._canvas.pack()
         # add button for starting game
@@ -626,8 +626,8 @@ class Board:
         # track the board state
         self._squares = {}  # Squares indexed by (x,y)
         self._enabledSpaces = ()  # list of valid moves as returned by BoardState.getmoves()
-        for x in range(8):
-            for y in range(8):
+        for x in range(15):
+            for y in range(15):
                 square = self._squares[x, y] = Board.Square(x, y)
                 x0 = x * GridSize + Offset
                 y0 = y * GridSize + Offset
@@ -790,7 +790,7 @@ class Board:
 
     def _selectSpace(self, x, y):
         # this is called when a human clicks on a space to place a piece
-        self._state = self._state.make_move(x * 10 + y + 11)
+        self._state = self._state.make_move(x * 17 + y + 18)
         self._updateBoard()
 
     def _gameOver(self):
