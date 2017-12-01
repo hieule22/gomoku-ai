@@ -6,25 +6,32 @@ MARGIN = 20  # Pixels around the board
 SIDE = 25  # Width of every board cell.
 WIDTH = HEIGHT = MARGIN * 2 + SIDE * 15  # Width and height of the whole board
 
-Bord = [["-" for x in range(15)] for y in range(15)]
+#Creates array that will hold the board representation that will be displayed.
+arr = [["-" for x in range(15)] for y in range(15)]
 
 
 class GomokuUI(Frame):
     """
     The Tkinter UI, responsible for drawing the board and accepting user input.
     """
-
     def __init__(self, parent):
+        #Creates the 15 by 15 board game
         self.game = Game(15, 15)
+        Types of players: GreedyPlayer
+        """
+        Types of players: RandomPlayer
+        Types of players: AlphaBetaMinimaxPlayer
+        Pass in players listed above as parameters for 
+        different modes for either player
+        """
         self.players = (GreedyPlayer(Piece.BLACK),
                         GreedyPlayer(Piece.WHITE))
         Frame.__init__(self, parent)
         self.parent = parent
-
         self.row, self.col = -1, -1
-
         self.__initUI()
 
+    #Some UI settings
     def __initUI(self):
         self.parent.title("Gomoku")
         self.pack(fill=BOTH)
@@ -37,13 +44,12 @@ class GomokuUI(Frame):
                                 command=self.__advance_game)
         advance_button.pack(fill=BOTH, side=BOTTOM)
 
+        #draws the board game altogether
         self.__draw_grid()
         self.__draw_puzzle()
 
+    # Draws the boxes of the game board
     def __draw_grid(self):
-        """
-        Draws grid divided with blue lines into 3x3 squares
-        """
         for i in range(18):
             color = "black"
 
@@ -59,6 +65,7 @@ class GomokuUI(Frame):
             y1 = MARGIN + i * SIDE
             self.canvas.create_line(x0, y0, x1, y1, fill=color)
 
+    #Draws the icons onto the board
     def __draw_puzzle(self):
         self.canvas.delete("numbers")
         icons = ['X', 'O', 'z']
@@ -73,6 +80,7 @@ class GomokuUI(Frame):
                         x, y, text=icons[answer.value], tags="numbers", fill=color
                     )
 
+    #Draws a circle that identifies the winning player
     def __draw_victory(self, winner):
         x0 = y0 = MARGIN + SIDE * 3
         x1 = y1 = MARGIN + SIDE * 12
@@ -80,7 +88,6 @@ class GomokuUI(Frame):
             x0, y0, x1, y1,
             tags="victory", fill="purple", outline="black"
         )
-        # create text
         x = y = MARGIN + 7.1 * SIDE + SIDE / 2.8
         self.canvas.create_text(
             x, y,
@@ -88,6 +95,7 @@ class GomokuUI(Frame):
             fill="white", font=("Arial", 28)
         )
 
+    #Processes every move and runs the game after each click
     def __advance_game(self):
         if self.game.terminal_test():
             self.__draw_victory(2 if self.game.to_move() == Piece.BLACK else 1)
