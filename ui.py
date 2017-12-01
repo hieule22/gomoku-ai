@@ -17,8 +17,8 @@ class GomokuUI(Frame):
     def __init__(self, parent):
         #Creates the 15 by 15 board game
         self.game = Game(15, 15)
-        Types of players: GreedyPlayer
         """
+        Types of players: GreedyPlayer
         Types of players: RandomPlayer
         Types of players: AlphaBetaMinimaxPlayer
         Pass in players listed above as parameters for 
