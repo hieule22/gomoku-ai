@@ -73,18 +73,6 @@ class GomokuUI(Frame):
                         x, y, text=icons[answer.value], tags="numbers", fill=color
                     )
 
-    def __draw_cursor(self):
-        self.canvas.delete("cursor")
-        if self.row >= 0 and self.col >= 0:
-            x0 = MARGIN + self.col * SIDE + 1
-            y0 = MARGIN + self.row * SIDE + 1
-            x1 = MARGIN + (self.col + 1) * SIDE - 1
-            y1 = MARGIN + (self.row + 1) * SIDE - 1
-            self.canvas.create_rectangle(
-                x0, y0, x1, y1,
-                outline="red", tags="cursor"
-            )
-
     def __advance_game(self):
         if self.game.terminal_test():
             return
@@ -95,7 +83,6 @@ class GomokuUI(Frame):
         self.game.display()
         self.__draw_grid()
         self.__draw_puzzle()
-        self.__draw_cursor()
 
 
 if __name__ == '__main__':
