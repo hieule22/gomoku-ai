@@ -16,8 +16,8 @@ class GomokuUI(Frame):
 
     def __init__(self, parent):
         self.game = Game(15, 15)
-        self.players = (RandomPlayer(Piece.BLACK),
-                        AlphaBetaMinimaxPlayer(Piece.WHITE))
+        self.players = (GreedyPlayer(Piece.BLACK),
+                        GreedyPlayer(Piece.WHITE))
         Frame.__init__(self, parent)
         self.parent = parent
 
@@ -45,7 +45,7 @@ class GomokuUI(Frame):
         Draws grid divided with blue lines into 3x3 squares
         """
         for i in range(18):
-            color = "blue"
+            color = "black"
 
             x0 = MARGIN + i * SIDE
             y0 = MARGIN
@@ -68,13 +68,29 @@ class GomokuUI(Frame):
                 if answer != Piece.EMPTY:
                     x = MARGIN + j * SIDE + SIDE / 2
                     y = MARGIN + i * SIDE + SIDE / 2
-                    color = "black" if answer == Piece.BLACK else "sea green"
+                    color = "black" if answer == Piece.BLACK else "purple"
                     self.canvas.create_text(
                         x, y, text=icons[answer.value], tags="numbers", fill=color
                     )
 
+    def __draw_victory(self, winner):
+        x0 = y0 = MARGIN + SIDE * 3
+        x1 = y1 = MARGIN + SIDE * 12
+        self.canvas.create_oval(
+            x0, y0, x1, y1,
+            tags="victory", fill="purple", outline="black"
+        )
+        # create text
+        x = y = MARGIN + 7.1 * SIDE + SIDE / 2.8
+        self.canvas.create_text(
+            x, y,
+            text="Player " + str(winner) + " wins!", tags="victory",
+            fill="white", font=("Arial", 28)
+        )
+
     def __advance_game(self):
         if self.game.terminal_test():
+            self.__draw_victory(2 if self.game.to_move() == Piece.BLACK else 1)
             return
 
         player = self.players[0] if self.game.to_move() == Piece.BLACK else self.players[1]
