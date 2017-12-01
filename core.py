@@ -11,9 +11,12 @@ class Piece(Enum):
 
 
 class Player:
-    def alphabeta_search(self, game):
+    def random_search(self, game):
         moves = game.legal_moves()
         return moves[randint(0, len(moves) - 1)]
+
+    # def alphabeta_full_search(self, game):
+
 
 
 def play_gomoku(player0, player1):
@@ -23,7 +26,7 @@ def play_gomoku(player0, player1):
 
     while True:
         for player in players:
-            move = player.alphabeta_search(game)
+            move = player.random_search(game)
             game.make_move(move)
             game.display()
 
@@ -31,7 +34,7 @@ def play_gomoku(player0, player1):
                 print("Game over")
                 return
 
-            sleep(3)
+            sleep(1)
 
 
 class Game:
@@ -49,6 +52,7 @@ class Game:
         self.cells = [[Piece.EMPTY for column in range(width)]
                       for row in range(height)]
         self.num_moves = 0
+        self.last_move = (-1, -1)
 
     def legal_moves(self):
         """Return a list of the allowable moves at this point."""
@@ -64,19 +68,21 @@ class Game:
         (row, col) = move
         self.cells[row][col] = self.to_move()
         self.num_moves += 1
+        self.last_move = move
 
     # def utility(self, state, player):
     #     "Return the value of this final state to player."
     #     abstract()
 
     def terminal_test(self):
+        if self.num_moves == self.height * self.width:
+            return True
+
         directions = [[1, 0], [0, 1], [1, 1], [1, -1]]
-        for row in range(self.height):
-            for col in range(self.width):
-                if self.cells[row][col] != Piece.EMPTY:
-                    for direction in directions:
-                        if self._check_direction(row, col, direction):
-                            return True
+        (row, col) = self.last_move
+        for direction in directions:
+            if self._check_direction(row, col, direction):
+                return True
         return False
 
     def _check_direction(self, row, column, direction):
@@ -120,7 +126,7 @@ class Game:
 
     def display(self):
         """Print or otherwise display the state."""
-        symbols = ['x', 'o', '-']
+        symbols = ['X', 'O', '.']
         for row in range(self.height):
             for col in range(self.width):
                 print(symbols[self.cells[row][col].value], end=' ')
