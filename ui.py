@@ -1,6 +1,4 @@
-from core import Game as Game
-from core import Player as Player
-from core import Piece as Piece
+from core import *
 
 from tkinter import *
 
@@ -18,7 +16,8 @@ class GomokuUI(Frame):
 
     def __init__(self, parent):
         self.game = Game(15, 15)
-        self.players = (Player(), Player())
+        self.players = (RandomPlayer(Piece.BLACK),
+                        AlphaBetaMinimaxPlayer(Piece.WHITE))
         Frame.__init__(self, parent)
         self.parent = parent
 
@@ -35,7 +34,7 @@ class GomokuUI(Frame):
         self.canvas.pack(fill=BOTH, side=TOP)
         advance_button = Button(self,
                                 text="Next Move",
-                                command=self.__start_game)
+                                command=self.__advance_game)
         advance_button.pack(fill=BOTH, side=BOTTOM)
 
         self.__draw_grid()
@@ -65,7 +64,7 @@ class GomokuUI(Frame):
         icons = ['X', 'O', 'z']
         for i in range(15):
             for j in range(15):
-                answer = self.game.cells[i][j]
+                answer = self.game._get_piece(i, j)
                 if answer != Piece.EMPTY:
                     x = MARGIN + j * SIDE + SIDE / 2
                     y = MARGIN + i * SIDE + SIDE / 2
@@ -86,13 +85,14 @@ class GomokuUI(Frame):
                 outline="red", tags="cursor"
             )
 
-    def __start_game(self):
+    def __advance_game(self):
         if self.game.terminal_test():
             return
 
         player = self.players[0] if self.game.to_move() == Piece.BLACK else self.players[1]
-        move = player.random_search(self.game)
-        self.game.make_move(move)
+        move = player.get_move(self.game)
+        self.game = self.game.make_move(move)
+        self.game.display()
         self.__draw_grid()
         self.__draw_puzzle()
         self.__draw_cursor()
